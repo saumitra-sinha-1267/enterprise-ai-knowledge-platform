@@ -1,0 +1,25 @@
+# ==============================================================================
+# ENTERPRISE GENERAL: GLOBAL CODE OF BUSINESS CONDUCT AND ETHICS
+# Classification: PUBLIC | Department: GENERAL | Document Ref: CORP-ETHICS-2026
+# ==============================================================================
+
+Section 1: Corporate Mission and Workplace Culture
+Our enterprise is committed to maintaining a collaborative, inclusive, and ethical professional environment. We treat colleagues, customers, partners, and vendors with dignity and respect. Discrimination or harassment on the basis of race, color, religion, gender, sexual orientation, disability, or national origin is strictly prohibited and results in immediate termination.
+
+Section 2: Confidentiality and Proprietary Information Protection
+Employees are entrusted with proprietary intellectual property, strategic roadmaps, customer records, and trade secrets. Unauthorized disclosure, copying, or forwarding of proprietary materials to personal email accounts or external storage drives constitutes a severe breach of employment contract and triggers legal sanctions.
+
+Section 3: Responsible Use of Generative AI and External Tools
+- Approved Platforms: Employees may only utilize enterprise-licensed and security-audited AI tools configured with zero data-retention guarantees.
+- Prohibited Activities: Employees are strictly forbidden from uploading or pasting customer Personally Identifiable Information (PII), proprietary source code, or unreleased financial metrics into public, consumer-facing AI chatbots or unvetted web applications.
+
+Section 4: Information Security and Cyber Hygiene
+- Identity Protection: Mandatory hardware-backed FIDO2 or approved Multi-Factor Authentication (MFA) tokens must be utilized for all enterprise logins. Passwords must never be shared across accounts or with coworkers.
+- Phishing & Awareness: All personnel must complete quarterly cybersecurity awareness and anti-phishing simulations administered by Enterprise SecOps.
+
+Section 5: Ethics Reporting and Whistleblower Protections
+Employees observing violations of this code, financial improprieties, or safety hazards are encouraged to report them promptly through any of the following protected channels:
+- Direct notification to their HR Business Partner or General Counsel.
+- 24/7 Confidential Ethics Hotline: 1-800-555-ETHX (toll-free).
+- Secure anonymous digital reporting portal: https://ethics.enterprise.internal
+The enterprise enforces a strict zero-retaliation policy for all good-faith reports.

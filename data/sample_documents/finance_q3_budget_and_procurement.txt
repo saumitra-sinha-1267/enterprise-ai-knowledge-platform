@@ -1,0 +1,28 @@
+# ==============================================================================
+# ENTERPRISE FINANCE: Q3 OPERATING BUDGET & PROCUREMENT DIRECTIVE
+# Classification: CONFIDENTIAL | Department: FINANCE | Fiscal Year: 2026-Q3
+# ==============================================================================
+
+Section 1: Q3 Departmental Capital and Operational Allocations
+For the third quarter of 2026, corporate finance has ratified the following departmental operational expenditures (OpEx) and capital allocations:
+- Cloud Infrastructure & Data Centers: $4,200,000 (Allocated to AWS and Google Cloud platform commitments)
+- Research & Engineering Innovation: $3,500,000 (Specialized tooling, GPU compute clusters, and developer hardware)
+- Global Marketing & Demand Generation: $1,800,000 (Customer acquisition, industry conferences, and paid media)
+- Human Resources & Global Talent: $950,000 (Executive search, employer branding, and learning subscriptions)
+- Facilities & General Administration: $620,000 (Lease obligations, office maintenance, and insurance)
+
+Section 2: Procurement Approval Hierarchy and Financial Thresholds
+All commercial contracts, software licenses, and capital expenditures must follow strict tiered managerial authorization:
+- Tier 1 (Up to $5,000): Authorized directly by Department Manager through the Coupa purchasing system.
+- Tier 2 ($5,001 to $25,000): Requires signed concurrence from Department Vice President (VP).
+- Tier 3 ($25,001 to $100,000): Requires formal written approval from the Chief Financial Officer (CFO).
+- Tier 4 (Above $100,000): Requires dual sign-off from both Chief Executive Officer (CEO) and CFO, accompanied by minimum 3 competitive vendor bids.
+
+Section 3: Vendor Terms and Invoicing Standard
+Standard commercial payment terms for all external enterprise suppliers are Net-30 days from receipt of a verified electronic invoice. Early payment discounts (e.g., 2/10 Net 30) must be pre-registered with Accounts Payable to optimize corporate treasury yields.
+
+Section 4: Business Travel and Entertainment (T&E) Expense Limits
+Employees traveling on authorized company business are subject to the following per-diem caps:
+- Domestic Lodging: Maximum $250 per night in standard tier markets; $350 in premium metropolitan hubs (NYC, SF, London, Tokyo).
+- Meal Allowance: $75 daily per diem across domestic travel ($20 breakfast, $25 lunch, $30 dinner). Alcohol expenses must be itemized separately and are not reimbursable on single-traveler meals.
+- Air Travel: Economy class is mandatory for all flights under 7 continuous hours. Business class booking is permitted exclusively for non-stop international flights exceeding 7 hours.

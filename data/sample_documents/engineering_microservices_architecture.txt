@@ -1,0 +1,25 @@
+# ==============================================================================
+# ENTERPRISE ENGINEERING: DISTRIBUTED MICROSERVICES ARCHITECTURE
+# Classification: INTERNAL | Department: ENGINEERING | Document Ref: ENG-ARCH-2026-v4
+# ==============================================================================
+
+Section 1: Core Architectural Principles and Communication Protocols
+Our technical platform is designed around loosely coupled, highly autonomous domain microservices.
+- External Ingress: All inbound public client traffic enters through Kong Enterprise API Gateway, which terminates TLS 1.3, executes rate limiting (default 500 requests/minute per authenticated client ID), and validates JWT tokens.
+- Synchronous Inter-Service RPC: Microservices communicate synchronously via gRPC using Protobuf v3 schemas defined in our centralized repository. REST/JSON is restricted to third-party public integrations.
+- Asynchronous Event Streaming: Apache Kafka serves as the enterprise event bus. Topics use a replication factor of 3 across distinct AWS availability zones with a default retention window of 7 days.
+
+Section 2: Containerization, Orchestration, and Service Mesh
+All microservices must be packaged as OCI-compliant container images built on Alpine Linux or Chainguard distroless base images.
+- Cluster Orchestration: Workloads run on Amazon Elastic Kubernetes Service (EKS) managed via Terraform and deployed with ArgoCD GitOps pipelines.
+- Service Mesh: Istio is deployed across all production clusters to enforce strict Zero-Trust Mutual TLS (mTLS) with cryptographically rotated SPIFFE/SPIRE x509 workload identities.
+- Autoscaling: Horizontal Pod Autoscaler (HPA) triggers scaling at 70% sustained CPU utilization or p95 response latencies exceeding 200 milliseconds.
+
+Section 3: Database Isolation and Storage Patterns
+Each microservice owns its dedicated database schema adhering to the Database-per-Service architectural pattern:
+- Transactional Relational Data: Managed PostgreSQL 16 instances with read replicas. Direct foreign cross-database SQL queries are strictly prohibited; cross-domain data aggregation must occur via Kafka CDC (Debezium) event streams.
+- Caching Layer: Redis Sentinel clusters provide sub-millisecond caching with a maximum default TTL of 300 seconds.
+
+Section 4: Service Level Agreements (SLAs) and Incident Response
+- Tier-1 Critical Path Services (Auth, Billing, Checkout): 99.99% availability SLA, maximum allowable p99 latency of 150ms, and a Mean Time to Resolution (MTTR) under 15 minutes.
+- On-Call Protocol: Primary and secondary engineers maintain 24/7 on-call availability via PagerDuty. Critical P1 alerts must be acknowledged within 5 minutes.

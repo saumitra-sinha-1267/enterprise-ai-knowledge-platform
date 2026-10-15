@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # Relational Database: PostgreSQL 16
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: enterprise_rag_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: enterprise_rag
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d enterprise_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # Vector Database: Qdrant
+  # ----------------------------------------------------------------------------
+  qdrant:
+    image: qdrant/qdrant:v1.8.4
+    container_name: enterprise_rag_qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6333/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # Backend API: FastAPI
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise_rag_backend
+    restart: always
+    command: >
+      sh -c "python scripts/seed_data.py &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      - PROJECT_NAME=Enterprise AI Knowledge Platform
+      - ENVIRONMENT=production
+      - DEBUG=False
+      - SECRET_KEY=prod_secret_enterprise_rag_2026_jwt_token_super_secure_random_key
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgrespassword@postgres:5432/enterprise_rag
+      - VECTOR_DB_TYPE=qdrant
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_IN_MEMORY=False
+      - QDRANT_COLLECTION_NAME=enterprise_knowledge_base
+      - EMBEDDING_MODEL_NAME=all-MiniLM-L6-v2
+      - LLM_PROVIDER=offline_mock
+      - PROMPT_INJECTION_PROTECTION_ENABLED=True
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  # ----------------------------------------------------------------------------
+  # Frontend UI: Streamlit Dashboard
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise_rag_frontend
+    restart: always
+    command: streamlit run ui/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    environment:
+      - BACKEND_API_URL=http://backend:8000/api/v1
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  qdrant_data:
