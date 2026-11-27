@@ -1,7 +1,11 @@
 # ==============================================================================
 # Enterprise AI Knowledge Platform — Secure RAG System
-# Dependencies
+# Dependencies (Optimized for Cloud Deployment on 512MB RAM instances)
 # ==============================================================================
+
+# Force lightweight CPU-only PyTorch (prevents downloading 2.5GB of CUDA packages)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 
 # Web Framework & API
 fastapi>=0.110.0,<1.0.0
@@ -25,16 +29,9 @@ passlib[bcrypt]>=1.7.4
 pypdf>=4.1.0
 python-docx>=1.1.0
 
-# Embeddings & Vector Search
+# Embeddings & Vector Search (CPU optimized)
 sentence-transformers>=2.5.1
 qdrant-client>=1.8.0
-
-# Frontend User Interface
-streamlit>=1.32.0
-
-# Testing & Quality Assurance
-pytest>=8.0.0
-pytest-asyncio>=0.23.5
 
 # Environment & Config
 python-dotenv>=1.0.1

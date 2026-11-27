@@ -26,9 +26,21 @@ class EmbeddingService:
     def _init_model(self) -> None:
         """Attempt to load SentenceTransformer; fallback to deterministic vectorizer if offline."""
         try:
+            import os
+            import gc
+            # Force single-thread on CPU to minimize memory footprint on 512MB RAM tiers
+            os.environ["OMP_NUM_THREADS"] = "1"
+            os.environ["MKL_NUM_THREADS"] = "1"
+            try:
+                import torch
+                torch.set_num_threads(1)
+            except Exception:
+                pass
+
             from sentence_transformers import SentenceTransformer
             logger.info(f"Loading SentenceTransformer model '{self.model_name}' on {self.device}...")
             self._model = SentenceTransformer(self.model_name, device=self.device)
+            gc.collect()
             logger.info("SentenceTransformer model loaded successfully.")
         except Exception as e:
             logger.warning(
