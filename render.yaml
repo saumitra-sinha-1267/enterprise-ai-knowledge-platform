@@ -1,11 +1,11 @@
 services:
   # ----------------------------------------------------------------------------
-  # Backend API: FastAPI + Qdrant (In-Memory) + RBAC + RAG
+  # Backend API: FastAPI + Qdrant (In-Memory) + FastEmbed (ONNX) + RBAC + RAG
   # ----------------------------------------------------------------------------
   - type: web
     name: enterprise-ai-backend
     env: python
-    buildCommand: pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && pip install --no-cache-dir -r requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
@@ -32,12 +32,6 @@ services:
         sync: false
       - key: PROMPT_INJECTION_PROTECTION_ENABLED
         value: "True"
-      - key: TORCH_NUM_THREADS
-        value: "1"
-      - key: OMP_NUM_THREADS
-        value: "1"
-      - key: MALLOC_TRIM_THRESHOLD_
-        value: "100000"
 
   # ----------------------------------------------------------------------------
   # Frontend UI: Streamlit Interactive Dashboard
@@ -45,7 +39,7 @@ services:
   - type: web
     name: enterprise-ai-frontend
     env: python
-    buildCommand: pip install --no-cache-dir -r ui/requirements.txt
+    buildCommand: pip install -r ui/requirements.txt
     startCommand: streamlit run ui/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHON_VERSION

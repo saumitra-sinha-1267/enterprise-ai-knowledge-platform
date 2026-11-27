@@ -14,21 +14,31 @@ EMBEDDING_DIMENSION = 384  # Dimension for all-MiniLM-L6-v2
 
 
 class EmbeddingService:
-    """Generates normalized vector embeddings for text chunks and queries."""
+    """Generates normalized vector embeddings for text chunks and queries using FastEmbed (ONNX) or fallback."""
 
     def __init__(self, model_name: str = None, device: str = None):
-        self.model_name = model_name or settings.EMBEDDING_MODEL_NAME
-        self.device = device or settings.EMBEDDING_DEVICE
-        self._model = None
+        self.model_name = model_name or settings.EMBEDDING_MODEL_NAME or "sentence-transformers/all-MiniLM-L6-v2"
+        self._fastembed_model = None
+        self._st_model = None
         self._fallback_mode = False
         self._init_model()
 
     def _init_model(self) -> None:
-        """Attempt to load SentenceTransformer; fallback to deterministic vectorizer if offline."""
+        """Attempt to load ultra-lightweight FastEmbed ONNX model; fallback gracefully if unavailable."""
+        # 1. FastEmbed (ONNX) - uses ~35MB RAM, NO PyTorch/CUDA dependencies
+        try:
+            from fastembed import TextEmbedding
+            logger.info(f"Loading FastEmbed ONNX model 'sentence-transformers/all-MiniLM-L6-v2'...")
+            self._fastembed_model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+            logger.info("FastEmbed ONNX model loaded successfully.")
+            return
+        except Exception as e:
+            logger.info(f"FastEmbed not loaded ({e}), trying SentenceTransformer fallback...")
+
+        # 2. SentenceTransformer (PyTorch) fallback
         try:
             import os
             import gc
-            # Force single-thread on CPU to minimize memory footprint on 512MB RAM tiers
             os.environ["OMP_NUM_THREADS"] = "1"
             os.environ["MKL_NUM_THREADS"] = "1"
             try:
@@ -38,10 +48,11 @@ class EmbeddingService:
                 pass
 
             from sentence_transformers import SentenceTransformer
-            logger.info(f"Loading SentenceTransformer model '{self.model_name}' on {self.device}...")
-            self._model = SentenceTransformer(self.model_name, device=self.device)
+            logger.info(f"Loading SentenceTransformer model '{self.model_name}' on CPU...")
+            self._st_model = SentenceTransformer(self.model_name, device="cpu")
             gc.collect()
             logger.info("SentenceTransformer model loaded successfully.")
+            return
         except Exception as e:
             logger.warning(
                 f"Could not load SentenceTransformer '{self.model_name}' ({e}). "
@@ -54,9 +65,18 @@ class EmbeddingService:
         if not texts:
             return []
 
-        if not self._fallback_mode and self._model is not None:
+        # 1. FastEmbed ONNX path (ultra-low memory)
+        if self._fastembed_model is not None:
             try:
-                embeddings = self._model.encode(
+                embeddings = list(self._fastembed_model.embed(texts))
+                return [e.tolist() for e in embeddings]
+            except Exception as e:
+                logger.warning(f"FastEmbed encoding error ({e}). Using fallback.")
+
+        # 2. SentenceTransformer path
+        if not self._fallback_mode and self._st_model is not None:
+            try:
+                embeddings = self._st_model.encode(
                     texts,
                     normalize_embeddings=True,
                     show_progress_bar=False,
@@ -66,7 +86,7 @@ class EmbeddingService:
             except Exception as e:
                 logger.warning(f"SentenceTransformer encoding error ({e}). Using offline embedding fallback.")
 
-        # Deterministic offline embedding generator using hashing and word trigrams
+        # 3. Deterministic offline embedding generator using hashing and word trigrams
         return [self._offline_hash_embed(t) for t in texts]
 
     def embed_query(self, query: str) -> List[float]:
