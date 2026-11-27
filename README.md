@@ -1,13 +1,40 @@
 # Enterprise AI Knowledge Platform — Secure RAG System
 
+[![Live Web App](https://img.shields.io/badge/Live%20App-Streamlit-FF4B4B.svg?style=for-the-badge&logo=streamlit)](https://enterprise-ai-frontend-k5zf.onrender.com)
+[![Backend API](https://img.shields.io/badge/Backend%20API-FastAPI%20on%20Render-009688.svg?style=for-the-badge&logo=fastapi)](https://enterprise-ai-backend-sl21.onrender.com)
+[![Swagger Docs](https://img.shields.io/badge/API%20Docs-Swagger%20UI-85EA2D.svg?style=for-the-badge&logo=swagger)](https://enterprise-ai-backend-sl21.onrender.com/docs)
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![Vector DB](https://img.shields.io/badge/Vector%20DB-Qdrant-red.svg)](https://qdrant.tech/)
-[![Embeddings](https://img.shields.io/badge/Embeddings-all--MiniLM--L6--v2-yellow.svg)](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+[![Embeddings](https://img.shields.io/badge/Embeddings-FastEmbed%20(ONNX)-yellow.svg)](https://github.com/qdrant/fastembed)
 [![Testing](https://img.shields.io/badge/Tests-38%2F38%20Passed%20(100%25)-brightgreen.svg)]()
 [![Security](https://img.shields.io/badge/RBAC%20Leakage-0.0%25-success.svg)]()
 
-Production-oriented Retrieval-Augmented Generation (RAG) knowledge platform built with **FastAPI**, **Qdrant**, **Sentence Transformers**, and **Streamlit**. Features **strict server-enforced document-level Role-Based Access Control (RBAC)**, **prompt injection defenses**, **structural delimiter isolation**, **provenance citations**, and **automated quality/security evaluation**.
+Production-oriented Retrieval-Augmented Generation (RAG) knowledge platform built with **FastAPI**, **Qdrant**, **FastEmbed (ONNX)**, and **Streamlit**. Features **strict server-enforced document-level Role-Based Access Control (RBAC)**, **prompt injection defenses**, **structural delimiter isolation**, **provenance citations**, and **automated quality/security evaluation**.
+
+---
+
+## 🌐 Live Cloud Deployment (24/7 Production)
+
+The entire platform is deployed live on Render and operates continuously without local execution:
+
+| Service | Endpoint | Description |
+| :--- | :--- | :--- |
+| 🖥️ **Interactive Web UI** | [**enterprise-ai-frontend-k5zf.onrender.com**](https://enterprise-ai-frontend-k5zf.onrender.com) | Streamlit dashboard with persona switching, document manager & citation inspector. |
+| ⚡ **Backend REST API** | [**enterprise-ai-backend-sl21.onrender.com**](https://enterprise-ai-backend-sl21.onrender.com) | FastAPI service with pre-retrieval vector filtering & Groq LLM synthesis. |
+| 📖 **Interactive Swagger UI** | [**enterprise-ai-backend-sl21.onrender.com/docs**](https://enterprise-ai-backend-sl21.onrender.com/docs) | Interactive OpenAPI documentation & test console. |
+| 🩺 **System Health Probe** | [**enterprise-ai-backend-sl21.onrender.com/api/v1/health**](https://enterprise-ai-backend-sl21.onrender.com/api/v1/health) | Live telemetry showing SQLite, Qdrant vector count (30 chunks), and LLM engine status. |
+
+### 🔑 Demo Personas (Pre-Seeded & Ready to Test)
+
+Use any of these pre-configured accounts in the [Live Web UI](https://enterprise-ai-frontend-k5zf.onrender.com) (or via the sidebar dropdown):
+
+| Persona | Username | Password | Role & Clearance | Verification Test Query | Expected Result |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **HR Director** | `hr_manager` | `HrPassword123!` | HR / Internal | *"What is our annual leave policy?"* | **Authorized**: Returns 25 days PTO, bi-weekly accrual & 10-day carryover policy with citations. |
+| **Finance Lead** | `finance_lead` | `FinancePassword123!` | Finance / Confidential | *"What is our Q3 cloud infrastructure budget?"* | **Authorized**: Returns exact **\$4,200,000** budget figure from Q3 procurement report. |
+| **General Staff** | `employee_alice` | `EmployeePassword123!` | Employee / Public | *"What is our Q3 cloud infrastructure budget?"* | **Denied by RBAC**: Pre-retrieval filter excludes finance chunks; reports insufficient information. |
+| **Staff Engineer** | `engineer_lead` | `EngineeringPassword123!` | Engineering / Internal | *"Describe our microservices architecture."* | **Authorized**: Returns service mesh, Kafka event bus, and resilience patterns. |
+| **Administrator** | `admin` | `AdminPassword123!` | Admin / Superuser | Access across all departments + Document Upload & Deletion tab. | Full administrative visibility. |
 
 ---
 
@@ -55,7 +82,7 @@ flowchart TD
     subgraph PipelineLayer ["Secure RAG Core"]
         Parser["Document Parser (PDF, DOCX, TXT)"]
         Chunker["Boundary-Aware Chunker"]
-        Embedder["SentenceTransformers (all-MiniLM-L6-v2)"]
+        Embedder["FastEmbed ONNX (all-MiniLM-L6-v2)"]
         PreFilter["RBAC Pre-Filtered Vector Search"]
         PromptBuilder["Untrusted Delimiter Sandbox"]
         LLM["Pluggable LLM (OfflineMock / OpenAI / Claude / Ollama)"]
@@ -196,7 +223,7 @@ Pre-seeded in the database for instant testing in the Streamlit UI:
 │   ├── models/
 │   │   └── document.py           # Relational metadata models for documents
 │   ├── retrieval/
-│   │   ├── embeddings.py         # SentenceTransformers (all-MiniLM-L6-v2)
+│   │   ├── embeddings.py         # FastEmbed ONNX (all-MiniLM-L6-v2) - ~35MB RAM footprint
 │   │   ├── search.py             # RBAC-filtered semantic search
 │   │   └── vector_store.py       # Qdrant client & InMemory vector store
 │   ├── security/

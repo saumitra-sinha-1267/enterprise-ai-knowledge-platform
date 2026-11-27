@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # Backend API Configuration
-_raw_backend_url = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/v1").strip().rstrip("/")
+_raw_backend_url = os.getenv("BACKEND_API_URL", "https://enterprise-ai-backend-sl21.onrender.com/api/v1").strip().rstrip("/")
 if not _raw_backend_url.startswith("http://") and not _raw_backend_url.startswith("https://"):
     _raw_backend_url = f"https://{_raw_backend_url}"
 if not _raw_backend_url.endswith("/api/v1"):
