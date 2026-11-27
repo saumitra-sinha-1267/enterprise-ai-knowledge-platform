@@ -39,8 +39,8 @@ services:
   - type: web
     name: enterprise-ai-frontend
     env: python
-    buildCommand: pip install -r ui/requirements.txt
-    startCommand: streamlit run ui/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m streamlit run ui/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
