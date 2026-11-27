@@ -84,6 +84,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/", summary="Root Entrypoint")
+@app.head("/", summary="Health check HEAD probe")
 def root() -> Dict[str, Any]:
     """Root endpoint welcoming users and pointing to OpenAPI documentation."""
     return {

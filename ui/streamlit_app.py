@@ -22,7 +22,13 @@ st.set_page_config(
 )
 
 # Backend API Configuration
-API_BASE_URL = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/v1")
+_raw_backend_url = os.getenv("BACKEND_API_URL", "http://localhost:8000/api/v1").strip().rstrip("/")
+if not _raw_backend_url.startswith("http://") and not _raw_backend_url.startswith("https://"):
+    _raw_backend_url = f"https://{_raw_backend_url}"
+if not _raw_backend_url.endswith("/api/v1"):
+    API_BASE_URL = f"{_raw_backend_url}/api/v1"
+else:
+    API_BASE_URL = _raw_backend_url
 
 # Custom CSS for styling
 st.markdown(

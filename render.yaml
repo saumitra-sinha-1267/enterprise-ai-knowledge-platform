@@ -45,7 +45,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.12
       - key: BACKEND_API_URL
-        fromService:
-          name: enterprise-ai-backend
-          type: web
-          property: host
+        value: https://enterprise-ai-backend-sl21.onrender.com/api/v1
