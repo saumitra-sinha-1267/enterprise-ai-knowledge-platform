@@ -32,6 +32,17 @@ async def lifespan(app: FastAPI):
         logger.info("Database initialized and demo accounts ready.")
     except Exception as e:
         logger.error(f"Error during startup database initialization: {e}")
+
+    # Seed sample enterprise documents in background so uvicorn binds to PORT immediately
+    try:
+        import asyncio
+        from scripts.seed_data import seed_all
+        loop = asyncio.get_running_loop()
+        loop.run_in_executor(None, seed_all)
+        logger.info("Background document ingestion scheduled.")
+    except Exception as e:
+        logger.warning(f"Background document seeding notice: {e}")
+
     yield
     logger.info("Enterprise AI Knowledge Platform shutting down.")
 

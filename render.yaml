@@ -5,8 +5,8 @@ services:
   - type: web
     name: enterprise-ai-backend
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: sh -c "python scripts/seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12
@@ -32,6 +32,12 @@ services:
         sync: false
       - key: PROMPT_INJECTION_PROTECTION_ENABLED
         value: "True"
+      - key: TORCH_NUM_THREADS
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: MALLOC_TRIM_THRESHOLD_
+        value: "100000"
 
   # ----------------------------------------------------------------------------
   # Frontend UI: Streamlit Interactive Dashboard
@@ -39,7 +45,7 @@ services:
   - type: web
     name: enterprise-ai-frontend
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --no-cache-dir -r ui/requirements.txt
     startCommand: streamlit run ui/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHON_VERSION
