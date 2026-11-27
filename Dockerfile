@@ -32,5 +32,5 @@ COPY . .
 # Expose backend (8000) and frontend (8501) ports
 EXPOSE 8000 8501
 
-# Default command launches backend API
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Default command launches backend API (respecting dynamic PORT environment variable)
+CMD ["sh", "-c", "python scripts/seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -1,0 +1,51 @@
+services:
+  # ----------------------------------------------------------------------------
+  # Backend API: FastAPI + Qdrant (In-Memory) + RBAC + RAG
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: enterprise-ai-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: sh -c "python scripts/seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: QDRANT_IN_MEMORY
+        value: "True"
+      - key: VECTOR_DB_TYPE
+        value: qdrant
+      - key: DATABASE_URL
+        value: sqlite:///./enterprise_rag.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: LLM_PROVIDER
+        value: openai
+      - key: OPENAI_API_BASE
+        value: https://api.groq.com/openai/v1
+      - key: OPENAI_MODEL
+        value: openai/gpt-oss-120b
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PROMPT_INJECTION_PROTECTION_ENABLED
+        value: "True"
+
+  # ----------------------------------------------------------------------------
+  # Frontend UI: Streamlit Interactive Dashboard
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: enterprise-ai-frontend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run ui/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: BACKEND_API_URL
+        fromService:
+          name: enterprise-ai-backend
+          type: web
+          property: host
