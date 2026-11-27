@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 import logging
+import os
 import re
 from typing import Dict, Any, Optional
 
@@ -93,9 +94,24 @@ class OpenAILLMClient(BaseLLMClient):
     """OpenAI API client using REST endpoint."""
 
     def __init__(self):
-        self.api_key = settings.OPENAI_API_KEY
-        self.api_base = settings.OPENAI_API_BASE.rstrip("/")
-        self.model = settings.OPENAI_MODEL
+        self.api_key = settings.OPENAI_API_KEY or os.getenv("GROQ_API_KEY") or os.getenv("LLM_API_KEY")
+
+        # Resolve API base: check if URL was set in LLM_PROVIDER or if using a Groq key (gsk_...)
+        raw_provider = os.getenv("LLM_PROVIDER", "")
+        if raw_provider.startswith("http"):
+            api_base = raw_provider
+        elif self.api_key and self.api_key.startswith("gsk_"):
+            api_base = "https://api.groq.com/openai/v1"
+        else:
+            api_base = settings.OPENAI_API_BASE or os.getenv("GROQ_API_BASE", "https://api.groq.com/openai/v1")
+
+        self.api_base = api_base.rstrip("/")
+
+        # Resolve model
+        model = settings.OPENAI_MODEL
+        if self.api_key and self.api_key.startswith("gsk_") and "gpt-4o" in model:
+            model = "openai/gpt-oss-120b"
+        self.model = model or os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
     def generate(self, user_prompt: str, system_prompt: str = SYSTEM_INSTRUCTION) -> str:
         if not self.api_key:

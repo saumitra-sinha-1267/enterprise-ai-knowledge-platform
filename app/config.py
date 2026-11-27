@@ -7,6 +7,7 @@ from enum import Enum
 import os
 from pathlib import Path
 from typing import List, Optional
+from pydantic import field_validator
 
 try:
     from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -70,6 +71,22 @@ class Settings(BaseSettings):
 
     # LLM Provider Configuration
     LLM_PROVIDER: LLMProviderType = LLMProviderType.OFFLINE_MOCK
+
+    @field_validator("LLM_PROVIDER", mode="before")
+    @classmethod
+    def parse_llm_provider(cls, v):
+        """Leniently parse LLM_PROVIDER to prevent crash if a URL or custom provider is passed."""
+        if isinstance(v, str):
+            v_str = v.strip().lower()
+            if "http" in v_str or "groq" in v_str or "openai" in v_str or "gpt" in v_str:
+                return LLMProviderType.OPENAI
+            if v_str in ["offline_mock", "mock"]:
+                return LLMProviderType.OFFLINE_MOCK
+            if "anthropic" in v_str or "claude" in v_str:
+                return LLMProviderType.ANTHROPIC
+            if "ollama" in v_str:
+                return LLMProviderType.OLLAMA
+        return v
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_MODEL: str = "gpt-4o-mini"
     OPENAI_API_BASE: str = "https://api.openai.com/v1"
